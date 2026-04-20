@@ -251,7 +251,7 @@ export const useStickyNotesDrag = ({
       try {
         target.setPointerCapture(e.pointerId);
       } catch (err) {
-        console.warn('Failed to set pointer capture:', err);
+        // Failed to set pointer capture - ignore and continue
         return;
       }
 
