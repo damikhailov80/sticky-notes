@@ -2,6 +2,8 @@
 
 A single-page web application for creating and managing sticky notes with drag-and-drop functionality, built with React and TypeScript.
 
+🔗 **[Live Demo](https://damikhailov80.github.io/sticky-notes)**
+
 ## Features Implemented
 
 ### Core Features (All 4 Required Features)
