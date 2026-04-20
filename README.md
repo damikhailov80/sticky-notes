@@ -1,70 +1,156 @@
-# Getting Started with Create React App
+# Sticky Notes Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A single-page web application for creating and managing sticky notes with drag-and-drop functionality, built with React and TypeScript.
 
-## Available Scripts
+## Features Implemented
 
-In the project directory, you can run:
+### Core Features (All 4 Required Features)
 
-### `npm start`
+- ✅ **Create notes** with specified size and position
+- ✅ **Resize notes** by dragging the bottom-right corner handle
+- ✅ **Move notes** by dragging the header area
+- ✅ **Delete notes** by dragging them to the trash zone (bottom-right corner)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Bonus Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- ✅ **Text editing** with auto-expanding textarea
+- ✅ **Bring to front** - click any note to bring it to the front (z-index management)
+- ✅ **Local storage persistence** - notes are automatically saved and restored on page reload
+- ✅ **Multiple colors** - 6 pastel color options for notes
 
-### `npm test`
+## System Requirements
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Screen Resolution**: Minimum 1024x768
+- **Supported Browsers**:
+  - Google Chrome (latest, Windows/Mac)
+  - Mozilla Firefox (latest, all platforms)
+  - Microsoft Edge (latest)
 
-### `npm run build`
+## Technologies Used
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Language**: TypeScript (strict mode enabled)
+- **Framework**: React 19.2.5 with functional components and hooks
+- **State Management**: Redux Toolkit with redux-persist for local storage
+- **Build Tool**: Create React App
+- **No external UI component libraries** - all components built from scratch
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Installation and Running
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+- Node.js (v14 or higher)
+- npm (v6 or higher)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Development Mode
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Clone the repository and navigate to the project directory
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. Install dependencies:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm install
+```
 
-## Learn More
+3. Start the development server:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+4. Open your browser to [http://localhost:3000](http://localhost:3000)
 
-### Code Splitting
+The application will automatically reload when you make changes to the source code.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Production Build
 
-### Analyzing the Bundle Size
+1. Create an optimized production build:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm run build
+```
 
-### Making a Progressive Web App
+2. The build artifacts will be stored in the `build/` directory
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. Serve the production build with any static file server:
 
-### Advanced Configuration
+```bash
+npx serve -s build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Usage Instructions
 
-### Deployment
+1. **Create a Note**: Click any color button in the left toolbar to create a new note with that color
+2. **Move a Note**: Click and drag the colored header area to move the note around the canvas
+3. **Resize a Note**: Click and drag the bottom-right corner handle to resize the note
+4. **Edit Text**: Click inside the note's text area and start typing
+5. **Delete a Note**: Drag the note to the trash zone in the bottom-right corner (it will highlight when active)
+6. **Bring to Front**: Click anywhere on a note to bring it to the front when notes overlap
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Project Structure
 
-### `npm run build` fails to minify
+```
+src/
+├── components/         # React components
+│   ├── StickyNote.tsx     # Individual sticky note component
+│   ├── StickyNote.css     # Note styling
+│   ├── Toolbar.tsx        # Color selection toolbar
+│   ├── Toolbar.css        # Toolbar styling
+│   ├── TrashZone.tsx      # Deletion zone component
+│   └── TrashZone.css      # Trash zone styling
+├── hooks/              # Custom React hooks
+│   └── useStickyNotesDrag.ts  # Centralized drag-and-drop logic
+├── store/              # Redux state management
+│   ├── store.ts           # Redux store configuration with persistence
+│   ├── notesSlice.ts      # Notes state slice with reducers
+│   └── hooks.ts           # Typed Redux hooks
+├── types/              # TypeScript type definitions
+│   └── index.ts           # Shared interfaces and types
+├── utils/              # Utility functions
+│   ├── constants.ts       # Application constants
+│   ├── notePosition.ts    # Note positioning calculations
+│   └── trashZone.ts       # Trash zone collision detection
+├── App.tsx            # Main application component
+├── App.css            # Application styling
+├── index.tsx          # Application entry point
+└── index.css          # Global styles
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Architecture Overview
+
+### State Management Architecture
+
+The application uses Redux Toolkit for centralized state management with redux-persist for automatic local storage synchronization. All note data (position, size, text, color, z-index) is stored in a single Redux slice (`notesSlice`), ensuring a single source of truth. This architecture provides predictable state updates through pure reducer functions and enables easy debugging through Redux DevTools. The persistence layer automatically serializes the state to localStorage on every change and rehydrates it on application load, providing seamless data persistence without manual save operations.
+
+### Drag-and-Drop System
+
+The drag-and-drop functionality is implemented through a custom hook (`useStickyNotesDrag`) that centralizes all drag logic in one place, avoiding code duplication across components. The system uses native browser mouse events (mousedown, mousemove, mouseup) rather than the HTML5 Drag API to provide precise control over drag behavior and visual feedback. The hook maintains internal drag state (mode, position, size) and exposes callback functions for move and resize operations. This architecture separates concerns: components handle rendering and user interaction initiation, while the hook manages the complex drag state machine and coordinate calculations. The trash zone uses real-time collision detection during drag operations to provide immediate visual feedback.
+
+### Component Architecture
+
+The application follows a component-based architecture with clear separation of concerns. The `App` component serves as the orchestrator, managing the overall layout and connecting child components to the Redux store. Presentational components (`StickyNote`, `Toolbar`, `TrashZone`) receive data and callbacks via props and remain unaware of the global state structure. The `StickyNote` component is fully controlled - it doesn't manage its own position or size, instead receiving these values from Redux and notifying the parent of user interactions. This unidirectional data flow makes the application predictable and testable. CSS modules are used for component-specific styling, preventing style conflicts and maintaining encapsulation.
+
+## Technical Notes
+
+- **Minimum note size**: 150x100 pixels (enforced during resize)
+- **Default note size**: 200x150 pixels
+- **Z-index management**: Automatic z-index assignment ensures proper layering
+- **Performance**: Uses React.memo and useCallback to prevent unnecessary re-renders
+- **Type safety**: Strict TypeScript mode with comprehensive type definitions
+- **No external drag libraries**: All drag-and-drop logic implemented from scratch
+- **Responsive textarea**: Automatically expands to fit content without scrollbars
+
+## Browser Compatibility
+
+Tested and verified on:
+
+- Chrome 120+ (Windows, macOS)
+- Firefox 121+ (Windows, macOS, Linux)
+- Edge 120+ (Windows)
+
+## Future Enhancements (Not Implemented)
+
+- REST API integration for server-side persistence
+- Collaborative editing with real-time synchronization
+- Note categories and filtering
+- Export/import functionality
+- Keyboard shortcuts

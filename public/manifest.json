@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sticky Notes",
+  "name": "Sticky Notes Application",
+  "description": "A web application for creating and managing sticky notes with drag-and-drop functionality",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#FFD700",
+  "background_color": "#f5f5f5"
 }
