@@ -2,7 +2,7 @@
   "name": "sticky-notes",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://<USERNAME>.github.io/<REPO_NAME>",
+  "homepage": "https://damikhailov80.github.io/sticky-notes",
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
     "react": "^19.2.5",
