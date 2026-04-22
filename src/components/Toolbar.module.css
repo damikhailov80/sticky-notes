@@ -14,7 +14,7 @@
   z-index: 100;
 }
 
-.toolbar-title {
+.toolbarTitle {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
@@ -23,25 +23,25 @@
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.toolbar-section {
+.toolbarSection {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.toolbar-label {
+.toolbarLabel {
   font-size: 14px;
   font-weight: 500;
   opacity: 0.9;
 }
 
-.color-buttons {
+.colorButtons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
-.color-button {
+.colorButton {
   width: 100%;
   aspect-ratio: 1;
   border: 3px solid white;
@@ -53,31 +53,31 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.color-button:hover {
+.colorButton:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.color-button:active {
+.colorButton:active {
   transform: scale(0.95);
 }
 
-.toolbar-instructions {
+.toolbarInstructions {
   margin-top: auto;
   font-size: 12px;
   line-height: 1.5;
   opacity: 0.9;
 }
 
-.toolbar-instructions p {
+.toolbarInstructions p {
   margin: 0 0 8px 0;
 }
 
-.toolbar-instructions ul {
+.toolbarInstructions ul {
   margin: 0;
   padding-left: 20px;
 }
 
-.toolbar-instructions li {
+.toolbarInstructions li {
   margin-bottom: 4px;
 }

@@ -13,7 +13,7 @@ import {
 import { AVAILABLE_COLORS, DEFAULT_NOTE_SIZE } from './utils/constants';
 import { calculateNewNotePosition } from './utils/notePosition';
 import { useStickyNotesDrag } from './hooks/useStickyNotesDrag';
-import './App.css';
+import styles from './App.module.css';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -46,9 +46,9 @@ const App = () => {
   );
 
   return (
-    <div className="app">
+    <div className={styles.app}>
       <Toolbar onAddNote={handleAddNote} availableColors={AVAILABLE_COLORS} />
-      <div className="canvas">
+      <div className={styles.canvas}>
         {notes.map(note => (
           <StickyNote
             key={note.id}

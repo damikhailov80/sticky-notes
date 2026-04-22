@@ -3,7 +3,7 @@ import { useAppDispatch } from '../store/hooks';
 import { updateNoteText, bringNoteToFront } from '../store/notesSlice';
 import { Note } from '../types';
 import { DragStartHandler } from '../hooks/useStickyNotesDrag';
-import './StickyNote.css';
+import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
   note: Note;
@@ -47,7 +47,7 @@ const StickyNote = ({
   return (
     <div
       ref={noteRef}
-      className={`sticky-note ${isOverTrash ? 'over-trash' : ''} ${isDragging ? 'dragging' : ''}`}
+      className={`${styles.stickyNote} ${isOverTrash ? styles.overTrash : ''} ${isDragging ? styles.dragging : ''}`}
       data-note-id={note.id}
       style={{
         left: `${note.position.x}px`,
@@ -59,16 +59,19 @@ const StickyNote = ({
       }}
       onPointerDown={handlePointerDown}
     >
-      <div className="note-header" />
+      <div className={styles.noteHeader} />
       <textarea
         ref={textareaRef}
-        className="note-textarea"
+        className={styles.noteTextarea}
         value={note.text}
         onChange={handleTextChange}
         onClick={handleTextClick}
         placeholder="Type your note here..."
       />
-      <div className="resize-handle" onPointerDown={handleResizePointerDown} />
+      <div
+        className={styles.resizeHandle}
+        onPointerDown={handleResizePointerDown}
+      />
     </div>
   );
 };

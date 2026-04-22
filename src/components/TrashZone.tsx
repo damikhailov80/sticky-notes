@@ -1,4 +1,4 @@
-import './TrashZone.css';
+import styles from './TrashZone.module.css';
 
 interface TrashZoneProps {
   isActive: boolean;
@@ -6,8 +6,8 @@ interface TrashZoneProps {
 
 const TrashZone = ({ isActive }: TrashZoneProps) => {
   return (
-    <div className={`trash-zone ${isActive ? 'active' : ''}`}>
-      <div className="trash-icon">
+    <div className={`${styles.trashZone} ${isActive ? styles.active : ''}`}>
+      <div className={styles.trashIcon}>
         <svg
           width="48"
           height="48"
@@ -24,7 +24,7 @@ const TrashZone = ({ isActive }: TrashZoneProps) => {
           <line x1="14" y1="11" x2="14" y2="17" />
         </svg>
       </div>
-      <div className="trash-text">
+      <div className={styles.trashText}>
         {isActive ? 'Release to Delete' : 'Drag Here to Delete'}
       </div>
     </div>

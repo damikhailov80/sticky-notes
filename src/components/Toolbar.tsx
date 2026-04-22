@@ -1,4 +1,4 @@
-import './Toolbar.css';
+import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
   onAddNote: (color: string) => void;
@@ -7,15 +7,15 @@ interface ToolbarProps {
 
 const Toolbar = ({ onAddNote, availableColors }: ToolbarProps) => {
   return (
-    <div className="toolbar">
-      <h2 className="toolbar-title">Sticky Notes</h2>
-      <div className="toolbar-section">
-        <span className="toolbar-label">Add Note:</span>
-        <div className="color-buttons">
+    <div className={styles.toolbar}>
+      <h2 className={styles.toolbarTitle}>Sticky Notes</h2>
+      <div className={styles.toolbarSection}>
+        <span className={styles.toolbarLabel}>Add Note:</span>
+        <div className={styles.colorButtons}>
           {availableColors.map(color => (
             <button
               key={color}
-              className="color-button"
+              className={styles.colorButton}
               style={{ backgroundColor: color }}
               onClick={() => onAddNote(color)}
               title={`Add ${color} note`}
@@ -23,7 +23,7 @@ const Toolbar = ({ onAddNote, availableColors }: ToolbarProps) => {
           ))}
         </div>
       </div>
-      <div className="toolbar-instructions">
+      <div className={styles.toolbarInstructions}>
         <p>
           <strong>Instructions:</strong>
         </p>
