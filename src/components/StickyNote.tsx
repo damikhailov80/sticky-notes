@@ -1,4 +1,4 @@
-import { useRef, memo } from 'react';
+import { useRef } from 'react';
 import { useAppDispatch } from '../store/hooks';
 import { updateNoteText, bringNoteToFront } from '../store/notesSlice';
 import { Note } from '../types';
@@ -76,6 +76,4 @@ const StickyNote = ({
   );
 };
 
-StickyNote.displayName = 'StickyNote';
-
-export default memo(StickyNote);
+export default StickyNote;
