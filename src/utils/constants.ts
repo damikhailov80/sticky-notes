@@ -7,10 +7,10 @@ export const AVAILABLE_COLORS = [
   '#98FB98', // Pale Green
 ];
 
-// Trash zone dimensions
+// Trash zone dimensions (must match TrashZone.module.css)
 export const TRASH_ZONE_SIZE = {
-  width: 170,
-  height: 170,
+  width: 180,
+  height: 150,
   margin: 20,
 };
 

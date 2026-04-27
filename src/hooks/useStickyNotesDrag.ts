@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { isOverTrashZone } from '../utils/trashZone';
+import { isNoteOverTrashZone } from '../utils/trashZone';
 import { TOOLBAR_WIDTH } from '../utils/notePosition';
 import { MIN_NOTE_SIZE } from '../utils/constants';
 import { DragState } from '../types';
@@ -122,7 +122,14 @@ export const useStickyNotesDrag = ({
 
       stateRef.current.pendingUpdate = { x, y };
 
-      const over = isOverTrashZone(e.clientX, e.clientY);
+      const visualX = drag.startPosition.x + deltaX;
+      const visualY = drag.startPosition.y + deltaY;
+      const over = isNoteOverTrashZone(
+        visualX,
+        visualY,
+        drag.startSize.width,
+        drag.startSize.height
+      );
       if (over !== stateRef.current.isOverTrash) {
         stateRef.current.isOverTrash = over;
         setIsOverTrash(over);
