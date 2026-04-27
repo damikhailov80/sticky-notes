@@ -19,15 +19,35 @@ const App = () => {
   const dispatch = useAppDispatch();
   const notes = useAppSelector(state => state.notes.notes);
 
+  const onMoveCommit = useCallback(
+    (noteId: string, position: { x: number; y: number }) =>
+      dispatch(updateNotePosition({ noteId, position })),
+    [dispatch]
+  );
+
+  const onResizeCommit = useCallback(
+    (noteId: string, size: { width: number; height: number }) =>
+      dispatch(updateNoteSize({ noteId, size })),
+    [dispatch]
+  );
+
+  const onDelete = useCallback(
+    (noteId: string) => dispatch(deleteNote(noteId)),
+    [dispatch]
+  );
+
+  const onBringToFront = useCallback(
+    (noteId: string) => dispatch(bringNoteToFront(noteId)),
+    [dispatch]
+  );
+
   // Use hook for drag system
   const { isOverTrash, currentDragNoteId, startMove, startResize } =
     useStickyNotesDrag({
-      onMoveCommit: (noteId, position) =>
-        dispatch(updateNotePosition({ noteId, position })),
-      onResizeCommit: (noteId, size) =>
-        dispatch(updateNoteSize({ noteId, size })),
-      onDelete: noteId => dispatch(deleteNote(noteId)),
-      bringToFront: noteId => dispatch(bringNoteToFront(noteId)),
+      onMoveCommit,
+      onResizeCommit,
+      onDelete,
+      bringToFront: onBringToFront,
     });
 
   const handleAddNote = useCallback(

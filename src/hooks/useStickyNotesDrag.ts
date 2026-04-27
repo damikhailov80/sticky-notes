@@ -283,10 +283,14 @@ export const useStickyNotesDrag = ({
     [bringToFront, addListeners]
   );
 
-  const startMove: DragStartHandler = (e, note, el) =>
-    startDrag(e, note, el, 'move');
-  const startResize: DragStartHandler = (e, note, el) =>
-    startDrag(e, note, el, 'resize');
+  const startMove: DragStartHandler = useCallback(
+    (e, note, el) => startDrag(e, note, el, 'move'),
+    [startDrag]
+  );
+  const startResize: DragStartHandler = useCallback(
+    (e, note, el) => startDrag(e, note, el, 'resize'),
+    [startDrag]
+  );
 
   useEffect(() => {
     const state = stateRef.current;
