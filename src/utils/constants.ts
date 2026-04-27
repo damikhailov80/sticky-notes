@@ -7,11 +7,11 @@ export const AVAILABLE_COLORS = [
   '#98FB98', // Pale Green
 ];
 
-export const TRASH_ZONE_BOUNDS = {
-  left: window.innerWidth - 190,
-  top: window.innerHeight - 190,
-  right: window.innerWidth - 20,
-  bottom: window.innerHeight - 20,
+// Trash zone dimensions
+export const TRASH_ZONE_SIZE = {
+  width: 170,
+  height: 170,
+  margin: 20,
 };
 
 export const MIN_NOTE_SIZE = { width: 150, height: 100 };
