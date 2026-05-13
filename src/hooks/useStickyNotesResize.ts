@@ -117,7 +117,8 @@ export const useStickyNotesResize = ({
       stateRef.current.pendingUpdate = null;
       stateRef.current.frameId = null;
     },
-    [onResizeCommit, removeListeners]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onResizeCommit]
   );
 
   const addListeners = useCallback(
