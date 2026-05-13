@@ -91,136 +91,125 @@ export const useStickyNotesDrag = ({
     }
   };
 
-  const handlersRef = useRef({
-    handlePointerMove: (e: PointerEvent) => {},
-    handlePointerUp: (e: PointerEvent) => {},
-  });
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
+      const { drag } = stateRef.current;
+      if (!drag || !drag.element) return;
 
-  handlersRef.current.handlePointerMove = (e: PointerEvent) => {
-    const { drag } = stateRef.current;
-    if (!drag || !drag.element) return;
+      const deltaX = e.clientX - drag.startX;
+      const deltaY = e.clientY - drag.startY;
 
-    const deltaX = e.clientX - drag.startX;
-    const deltaY = e.clientY - drag.startY;
-
-    if (drag.mode === 'move') {
-      // Calculate with boundary constraints
-      const x = Math.max(
-        0,
-        Math.min(
-          window.innerWidth - drag.startSize.width - TOOLBAR_WIDTH,
-          drag.startPosition.x + deltaX
-        )
-      );
-      const y = Math.max(
-        0,
-        Math.min(
-          window.innerHeight - drag.startSize.height,
-          drag.startPosition.y + deltaY
-        )
-      );
-
-      stateRef.current.pendingUpdate = { x, y };
-
-      const visualX = drag.startPosition.x + deltaX;
-      const visualY = drag.startPosition.y + deltaY;
-      const over = isNoteOverTrashZone(
-        visualX,
-        visualY,
-        drag.startSize.width,
-        drag.startSize.height
-      );
-      if (over !== stateRef.current.isOverTrash) {
-        stateRef.current.isOverTrash = over;
-        setIsOverTrash(over);
-      }
-    } else {
-      const width = Math.max(
-        MIN_NOTE_SIZE.width,
-        drag.startSize.width + deltaX
-      );
-      const height = Math.max(
-        MIN_NOTE_SIZE.height,
-        drag.startSize.height + deltaY
-      );
-      stateRef.current.pendingUpdate = { width, height };
-    }
-
-    // Batching via requestAnimationFrame
-    if (!stateRef.current.frameId) {
-      stateRef.current.frameId = requestAnimationFrame(() => {
-        const { pendingUpdate, drag: d } = stateRef.current;
-        if (!pendingUpdate || !d || !d.element || !d.mode) {
-          stateRef.current.frameId = null;
-          return;
-        }
-
-        updateElement(d.element, d.mode, pendingUpdate, d.startPosition);
-
-        stateRef.current.frameId = null;
-        stateRef.current.pendingUpdate = null;
-      });
-    }
-  };
-
-  handlersRef.current.handlePointerUp = (e: PointerEvent) => {
-    const { drag, liveOffset, isOverTrash: over } = stateRef.current;
-    if (!drag) return;
-
-    if (stateRef.current.frameId) {
-      cancelAnimationFrame(stateRef.current.frameId);
-      stateRef.current.frameId = null;
-    }
-
-    const target = drag.target;
-
-    target.removeEventListener('pointermove', handlePointerMove);
-    target.removeEventListener('pointerup', handlePointerUp);
-    target.removeEventListener('pointercancel', handlePointerUp);
-    target.removeEventListener('lostpointercapture', handlePointerUp);
-
-    try {
-      if (target.hasPointerCapture(e.pointerId)) {
-        target.releasePointerCapture(e.pointerId);
-      }
-    } catch (err) {
-      // Ignore errors
-    }
-
-    if (drag.element && drag.noteId) {
       if (drag.mode === 'move') {
-        const isPointerUp = e.type === 'pointerup';
-        const shouldDelete = isPointerUp && over;
+        // Calculate with boundary constraints
+        const x = Math.max(
+          0,
+          Math.min(
+            window.innerWidth - drag.startSize.width - TOOLBAR_WIDTH,
+            drag.startPosition.x + deltaX
+          )
+        );
+        const y = Math.max(
+          0,
+          Math.min(
+            window.innerHeight - drag.startSize.height,
+            drag.startPosition.y + deltaY
+          )
+        );
 
-        if (shouldDelete) {
-          onDelete(drag.noteId);
-        } else {
-          onMoveCommit(drag.noteId, {
-            x: drag.startPosition.x + liveOffset.x,
-            y: drag.startPosition.y + liveOffset.y,
-          });
+        stateRef.current.pendingUpdate = { x, y };
+
+        const visualX = drag.startPosition.x + deltaX;
+        const visualY = drag.startPosition.y + deltaY;
+        const over = isNoteOverTrashZone(
+          visualX,
+          visualY,
+          drag.startSize.width,
+          drag.startSize.height
+        );
+        if (over !== stateRef.current.isOverTrash) {
+          stateRef.current.isOverTrash = over;
+          setIsOverTrash(over);
         }
-        cleanupElement(drag.element, drag.mode);
       } else {
-        const rect = drag.element.getBoundingClientRect();
-        onResizeCommit(drag.noteId, {
-          width: Math.round(rect.width),
-          height: Math.round(rect.height),
+        const width = Math.max(
+          MIN_NOTE_SIZE.width,
+          drag.startSize.width + deltaX
+        );
+        const height = Math.max(
+          MIN_NOTE_SIZE.height,
+          drag.startSize.height + deltaY
+        );
+        stateRef.current.pendingUpdate = { width, height };
+      }
+
+      // Batching via requestAnimationFrame
+      if (!stateRef.current.frameId) {
+        stateRef.current.frameId = requestAnimationFrame(() => {
+          const { pendingUpdate, drag: d } = stateRef.current;
+          if (!pendingUpdate || !d || !d.element || !d.mode) {
+            stateRef.current.frameId = null;
+            return;
+          }
+
+          updateElement(d.element, d.mode, pendingUpdate, d.startPosition);
+
+          stateRef.current.frameId = null;
+          stateRef.current.pendingUpdate = null;
         });
       }
-    }
+    },
+    [setIsOverTrash]
+  );
 
-    cleanupState();
-  };
+  const handlePointerUp = useCallback(
+    (e: PointerEvent) => {
+      const { drag, liveOffset, isOverTrash: over } = stateRef.current;
+      if (!drag) return;
 
-  // Stable event handler wrappers
-  const handlePointerMove = useCallback((e: PointerEvent) => {
-    handlersRef.current.handlePointerMove(e);
-  }, []);
+      if (stateRef.current.frameId) {
+        cancelAnimationFrame(stateRef.current.frameId);
+        stateRef.current.frameId = null;
+      }
 
-  const handlePointerUp = useCallback((e: PointerEvent) => {
-    handlersRef.current.handlePointerUp(e);
-  }, []);
+      const target = drag.target;
+
+      removeListeners(target);
+
+      try {
+        if (target.hasPointerCapture(e.pointerId)) {
+          target.releasePointerCapture(e.pointerId);
+        }
+      } catch (err) {
+        // Ignore errors
+      }
+
+      if (drag.element && drag.noteId) {
+        if (drag.mode === 'move') {
+          const isPointerUp = e.type === 'pointerup';
+          const shouldDelete = isPointerUp && over;
+
+          if (shouldDelete) {
+            onDelete(drag.noteId);
+          } else {
+            onMoveCommit(drag.noteId, {
+              x: drag.startPosition.x + liveOffset.x,
+              y: drag.startPosition.y + liveOffset.y,
+            });
+          }
+          cleanupElement(drag.element, drag.mode);
+        } else {
+          const rect = drag.element.getBoundingClientRect();
+          onResizeCommit(drag.noteId, {
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          });
+        }
+      }
+
+      cleanupState();
+    },
+    [onDelete, onMoveCommit, onResizeCommit]
+  );
 
   const addListeners = useCallback(
     (target: HTMLElement) => {

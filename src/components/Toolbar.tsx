@@ -1,23 +1,41 @@
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { addNote } from '../store/notesSlice';
+import { AVAILABLE_COLORS, DEFAULT_NOTE_SIZE } from '../utils/constants';
+import { calculateNewNotePosition } from '../utils/notePosition';
 import styles from './Toolbar.module.css';
 
-interface ToolbarProps {
-  onAddNote: (color: string) => void;
-  availableColors: string[];
-}
+const Toolbar = () => {
+  const dispatch = useAppDispatch();
+  const notesCount = useAppSelector(state => state.notes.notes.length);
 
-const Toolbar = ({ onAddNote, availableColors }: ToolbarProps) => {
+  const handleAddNote = useCallback(
+    (color: string) => {
+      const position = calculateNewNotePosition(notesCount);
+
+      dispatch(
+        addNote({
+          color,
+          position,
+          size: { ...DEFAULT_NOTE_SIZE },
+        })
+      );
+    },
+    [dispatch, notesCount]
+  );
+
   return (
     <div className={styles.toolbar}>
       <h2 className={styles.toolbarTitle}>Sticky Notes</h2>
       <div className={styles.toolbarSection}>
         <span className={styles.toolbarLabel}>Add Note:</span>
         <div className={styles.colorButtons}>
-          {availableColors.map(color => (
+          {AVAILABLE_COLORS.map(color => (
             <button
               key={color}
               className={styles.colorButton}
               style={{ backgroundColor: color }}
-              onClick={() => onAddNote(color)}
+              onClick={() => handleAddNote(color)}
               title={`Add ${color} note`}
             />
           ))}

@@ -4,14 +4,11 @@ import Toolbar from './components/Toolbar';
 import TrashZone from './components/TrashZone';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import {
-  addNote,
   deleteNote,
   updateNotePosition,
   updateNoteSize,
   bringNoteToFront,
 } from './store/notesSlice';
-import { AVAILABLE_COLORS, DEFAULT_NOTE_SIZE } from './utils/constants';
-import { calculateNewNotePosition } from './utils/notePosition';
 import { useStickyNotesDrag } from './hooks/useStickyNotesDrag';
 import styles from './App.module.css';
 
@@ -50,24 +47,9 @@ const App = () => {
       bringToFront: onBringToFront,
     });
 
-  const handleAddNote = useCallback(
-    (color: string) => {
-      const position = calculateNewNotePosition(notes.length);
-
-      dispatch(
-        addNote({
-          color,
-          position,
-          size: { ...DEFAULT_NOTE_SIZE },
-        })
-      );
-    },
-    [dispatch, notes.length]
-  );
-
   return (
     <div className={styles.app}>
-      <Toolbar onAddNote={handleAddNote} availableColors={AVAILABLE_COLORS} />
+      <Toolbar />
       <div className={styles.canvas}>
         {notes.map(note => (
           <StickyNote
