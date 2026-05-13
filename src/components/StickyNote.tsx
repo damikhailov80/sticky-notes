@@ -2,15 +2,16 @@ import { useRef, memo } from 'react';
 import { useAppDispatch } from '../store/hooks';
 import { updateNoteText, bringNoteToFront } from '../store/notesSlice';
 import { Note } from '../types';
-import { DragStartHandler } from '../hooks/useStickyNotesDrag';
+import { MoveStartHandler } from '../hooks/useStickyNotesDrag';
+import { ResizeStartHandler } from '../hooks/useStickyNotesResize';
 import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
   note: Note;
   isOverTrash: boolean;
   isDragging: boolean;
-  onStartMove: DragStartHandler;
-  onStartResize: DragStartHandler;
+  onStartMove: MoveStartHandler;
+  onStartResize: ResizeStartHandler;
 }
 
 const StickyNote = ({

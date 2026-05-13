@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isNoteOverTrashZone } from '../utils/trashZone';
 import { TOOLBAR_WIDTH } from '../utils/notePosition';
-import { MIN_NOTE_SIZE } from '../utils/constants';
-import { DragState } from '../types';
 
 interface NoteData {
   id: string;
   position: { x: number; y: number };
-  size: { width: number; height: number };
 }
 
-export type DragStartHandler = (
+export type MoveStartHandler = (
   e: React.PointerEvent,
   note: NoteData,
   element: HTMLDivElement | null
@@ -18,17 +15,22 @@ export type DragStartHandler = (
 
 interface UseStickyNotesDragParams {
   onMoveCommit: (noteId: string, pos: { x: number; y: number }) => void;
-  onResizeCommit: (
-    noteId: string,
-    size: { width: number; height: number }
-  ) => void;
   onDelete: (noteId: string) => void;
   bringToFront: (noteId: string) => void;
 }
 
+interface MoveState {
+  noteId: string;
+  element: HTMLDivElement;
+  target: HTMLElement;
+  startX: number;
+  startY: number;
+  startPosition: { x: number; y: number };
+  size: { width: number; height: number };
+}
+
 export const useStickyNotesDrag = ({
   onMoveCommit,
-  onResizeCommit,
   onDelete,
   bringToFront,
 }: UseStickyNotesDragParams) => {
@@ -38,15 +40,13 @@ export const useStickyNotesDrag = ({
   );
 
   const stateRef = useRef({
-    drag: null as DragState | null,
+    move: null as MoveState | null,
     isOverTrash: false,
     frameId: null as number | null,
     liveOffset: { x: 0, y: 0 },
     pendingUpdate: null as Partial<{
       x: number;
       y: number;
-      width: number;
-      height: number;
     }> | null,
   });
 
@@ -54,7 +54,7 @@ export const useStickyNotesDrag = ({
     if (stateRef.current.frameId) {
       cancelAnimationFrame(stateRef.current.frameId);
     }
-    stateRef.current.drag = null;
+    stateRef.current.move = null;
     stateRef.current.pendingUpdate = null;
     stateRef.current.frameId = null;
     stateRef.current.liveOffset = { x: 0, y: 0 };
@@ -69,89 +69,71 @@ export const useStickyNotesDrag = ({
   // Update DOM element
   const updateElement = (
     element: HTMLDivElement,
-    mode: 'move' | 'resize',
-    update: Partial<{ x: number; y: number; width: number; height: number }>,
+    update: Partial<{ x: number; y: number }>,
     startPosition: { x: number; y: number }
   ) => {
-    if (mode === 'move' && update.x !== undefined && update.y !== undefined) {
+    if (update.x !== undefined && update.y !== undefined) {
       const offX = update.x - startPosition.x;
       const offY = update.y - startPosition.y;
       stateRef.current.liveOffset = { x: offX, y: offY };
       element.style.transform = `translate(${offX}px, ${offY}px)`;
-    } else if (update.width !== undefined && update.height !== undefined) {
-      element.style.width = `${update.width}px`;
-      element.style.height = `${update.height}px`;
     }
   };
 
   // Cleanup element styles
-  const cleanupElement = (element: HTMLDivElement, mode: 'move' | 'resize') => {
-    if (mode === 'move') {
-      element.style.transform = '';
-    }
+  const cleanupElement = (element: HTMLDivElement) => {
+    element.style.transform = '';
   };
 
   const handlePointerMove = useCallback(
     (e: PointerEvent) => {
-      const { drag } = stateRef.current;
-      if (!drag || !drag.element) return;
+      const { move } = stateRef.current;
+      if (!move) return;
 
-      const deltaX = e.clientX - drag.startX;
-      const deltaY = e.clientY - drag.startY;
+      const deltaX = e.clientX - move.startX;
+      const deltaY = e.clientY - move.startY;
 
-      if (drag.mode === 'move') {
-        // Calculate with boundary constraints
-        const x = Math.max(
-          0,
-          Math.min(
-            window.innerWidth - drag.startSize.width - TOOLBAR_WIDTH,
-            drag.startPosition.x + deltaX
-          )
-        );
-        const y = Math.max(
-          0,
-          Math.min(
-            window.innerHeight - drag.startSize.height,
-            drag.startPosition.y + deltaY
-          )
-        );
+      // Calculate with boundary constraints
+      const x = Math.max(
+        0,
+        Math.min(
+          window.innerWidth - move.size.width - TOOLBAR_WIDTH,
+          move.startPosition.x + deltaX
+        )
+      );
+      const y = Math.max(
+        0,
+        Math.min(
+          window.innerHeight - move.size.height,
+          move.startPosition.y + deltaY
+        )
+      );
 
-        stateRef.current.pendingUpdate = { x, y };
+      stateRef.current.pendingUpdate = { x, y };
 
-        const visualX = drag.startPosition.x + deltaX;
-        const visualY = drag.startPosition.y + deltaY;
-        const over = isNoteOverTrashZone(
-          visualX,
-          visualY,
-          drag.startSize.width,
-          drag.startSize.height
-        );
-        if (over !== stateRef.current.isOverTrash) {
-          stateRef.current.isOverTrash = over;
-          setIsOverTrash(over);
-        }
-      } else {
-        const width = Math.max(
-          MIN_NOTE_SIZE.width,
-          drag.startSize.width + deltaX
-        );
-        const height = Math.max(
-          MIN_NOTE_SIZE.height,
-          drag.startSize.height + deltaY
-        );
-        stateRef.current.pendingUpdate = { width, height };
+      const visualX = move.startPosition.x + deltaX;
+      const visualY = move.startPosition.y + deltaY;
+      const over = isNoteOverTrashZone(
+        visualX,
+        visualY,
+        move.size.width,
+        move.size.height
+      );
+      if (over !== stateRef.current.isOverTrash) {
+        stateRef.current.isOverTrash = over;
+        setIsOverTrash(over);
       }
 
       // Batching via requestAnimationFrame
       if (!stateRef.current.frameId) {
         stateRef.current.frameId = requestAnimationFrame(() => {
-          const { pendingUpdate, drag: d } = stateRef.current;
-          if (!pendingUpdate || !d || !d.element || !d.mode) {
+          const { pendingUpdate, move: m } = stateRef.current;
+          if (!pendingUpdate || !m) {
             stateRef.current.frameId = null;
             return;
           }
 
-          updateElement(d.element, d.mode, pendingUpdate, d.startPosition);
+          updateElement(m.element, pendingUpdate, m.startPosition);
 
           stateRef.current.frameId = null;
           stateRef.current.pendingUpdate = null;
@@ -163,15 +145,15 @@ export const useStickyNotesDrag = ({
 
   const handlePointerUp = useCallback(
     (e: PointerEvent) => {
-      const { drag, liveOffset, isOverTrash: over } = stateRef.current;
-      if (!drag) return;
+      const { move, liveOffset, isOverTrash: over } = stateRef.current;
+      if (!move) return;
 
       if (stateRef.current.frameId) {
         cancelAnimationFrame(stateRef.current.frameId);
         stateRef.current.frameId = null;
       }
 
-      const target = drag.target;
+      const target = move.target;
 
       removeListeners(target);
 
@@ -183,32 +165,22 @@ export const useStickyNotesDrag = ({
         // Ignore errors
       }
 
-      if (drag.element && drag.noteId) {
-        if (drag.mode === 'move') {
-          const isPointerUp = e.type === 'pointerup';
-          const shouldDelete = isPointerUp && over;
+      const shouldDelete = e.type === 'pointerup' && over;
 
-          if (shouldDelete) {
-            onDelete(drag.noteId);
-          } else {
-            onMoveCommit(drag.noteId, {
-              x: drag.startPosition.x + liveOffset.x,
-              y: drag.startPosition.y + liveOffset.y,
-            });
-          }
-          cleanupElement(drag.element, drag.mode);
-        } else {
-          const rect = drag.element.getBoundingClientRect();
-          onResizeCommit(drag.noteId, {
-            width: Math.round(rect.width),
-            height: Math.round(rect.height),
-          });
-        }
+      if (shouldDelete) {
+        onDelete(move.noteId);
+      } else {
+        onMoveCommit(move.noteId, {
+          x: move.startPosition.x + liveOffset.x,
+          y: move.startPosition.y + liveOffset.y,
+        });
       }
+      cleanupElement(move.element);
 
       cleanupState();
     },
-    [onDelete, onMoveCommit, onResizeCommit]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onDelete, onMoveCommit]
   );
 
   const addListeners = useCallback(
@@ -231,13 +203,8 @@ export const useStickyNotesDrag = ({
     [handlePointerMove, handlePointerUp]
   );
 
-  const startDrag = useCallback(
-    (
-      e: React.PointerEvent,
-      note: NoteData,
-      element: HTMLDivElement | null,
-      mode: 'move' | 'resize'
-    ) => {
+  const startMove: MoveStartHandler = useCallback(
+    (e, note, element) => {
       if (!element) return;
 
       e.preventDefault();
@@ -251,45 +218,32 @@ export const useStickyNotesDrag = ({
         return;
       }
 
-      stateRef.current.drag = {
-        mode,
+      stateRef.current.move = {
         noteId: note.id,
         element,
         target,
         startX: e.clientX,
         startY: e.clientY,
         startPosition: { ...note.position },
-        startSize: { ...note.size },
+        size: { width: element.offsetWidth, height: element.offsetHeight },
       };
       setCurrentDragNoteId(note.id);
 
-      if (mode === 'move') {
-        bringToFront(note.id);
-      }
+      bringToFront(note.id);
 
       addListeners(target);
     },
     [bringToFront, addListeners]
   );
 
-  const startMove: DragStartHandler = useCallback(
-    (e, note, el) => startDrag(e, note, el, 'move'),
-    [startDrag]
-  );
-  const startResize: DragStartHandler = useCallback(
-    (e, note, el) => startDrag(e, note, el, 'resize'),
-    [startDrag]
-  );
-
   useEffect(() => {
     const state = stateRef.current;
-    const cleanup = removeListeners;
     return () => {
       if (state.frameId) {
         cancelAnimationFrame(state.frameId);
       }
-      if (state.drag?.target) {
-        cleanup(state.drag.target);
+      if (state.move?.target) {
+        removeListeners(state.move.target);
       }
     };
   }, [removeListeners]);
@@ -298,6 +252,5 @@ export const useStickyNotesDrag = ({
     isOverTrash,
     currentDragNoteId,
     startMove,
-    startResize,
   };
 };
