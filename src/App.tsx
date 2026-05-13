@@ -10,6 +10,7 @@ import {
   bringNoteToFront,
 } from './store/notesSlice';
 import { useStickyNotesDrag } from './hooks/useStickyNotesDrag';
+import { useStickyNotesResize } from './hooks/useStickyNotesResize';
 import styles from './App.module.css';
 
 const App = () => {
@@ -38,14 +39,16 @@ const App = () => {
     [dispatch]
   );
 
-  // Use hook for drag system
-  const { isOverTrash, currentDragNoteId, startMove, startResize } =
-    useStickyNotesDrag({
-      onMoveCommit,
-      onResizeCommit,
-      onDelete,
-      bringToFront: onBringToFront,
-    });
+  // Use hooks for drag and resize systems
+  const { isOverTrash, currentDragNoteId, startMove } = useStickyNotesDrag({
+    onMoveCommit,
+    onDelete,
+    bringToFront: onBringToFront,
+  });
+
+  const { startResize } = useStickyNotesResize({
+    onResizeCommit,
+  });
 
   return (
     <div className={styles.app}>
